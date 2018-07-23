@@ -1,0 +1,2 @@
+model_checkpoint_path: "/home/amit/notebooks/self-driving/model/model.ckpt"
+all_model_checkpoint_paths: "/home/amit/notebooks/self-driving/model/model.ckpt"

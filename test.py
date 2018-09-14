@@ -77,6 +77,7 @@ def readDataSetInfo(dataset_id='01', shuffle=True, start_index=0):
 	info_data_dict = {}
 	dataset_path = os.path.join('data', 'dataset_' + dataset_id)
 	info_file_path = os.path.join(dataset_path, 'data.txt')
+	print dataset_path
 	xs = []
 	ys = []
 	with open(info_file_path, 'r') as f:

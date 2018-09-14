@@ -18,7 +18,7 @@ def rotateImage(image, angle):
 
 
 def predictAngles(q):
-	data_info = readDataSetInfo(shuffle=False, start_index=2400)
+	data_info = readDataSetInfo(dataset_id='01', shuffle=False)
 	counter = 1
 	for original_images, small_images, rotation in readImages(data_info, batch_size=30):
 		images = preprocessData(small_images)

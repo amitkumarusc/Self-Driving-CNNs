@@ -3,6 +3,8 @@ from copy import deepcopy
 from datetime import datetime
 
 import numpy as np
+import time
+
 try:
 	import _pickle as cPickle
 except:
@@ -34,14 +36,16 @@ class BaseModel(object):
 	def learn_from_epoch(self):
 		raise Exception('The learn_from_epoch function needs to be overridden by the class')
 
-	def calculate_metrics(self, epoch):
+	def calculate_metrics(self, epoch, time_taken):
 		raise Exception('The calculate_metrics function needs to be overridden by the class')
 
 	def train(self):
 		for epoch in range(self.max_iters):
+			start = time.time()
 			self.learn_from_epoch()
+			end = time.time()
 
-			self.calculate_metrics(epoch)
+			self.calculate_metrics(epoch, end-start)
 
 	def predict(self):
 		raise Exception('The predict function needs to be overridden by the class')

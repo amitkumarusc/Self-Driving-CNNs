@@ -34,7 +34,7 @@ class BumbleBee(BaseModel):
 	def load_dataset(self):
 		self.data_info = readDataSetInfo()
 		
-		sample_image, sample_small_image, sample_rotation = readImages(self.data_info, batch_size=1).next()
+		sample_image, sample_small_image, sample_rotation = readImages(self.data_info, batch_size=1, limit=2000).next()
 
 		self.image_height = sample_small_image.shape[0]
 		self.image_width = sample_small_image.shape[1]
@@ -65,9 +65,9 @@ class BumbleBee(BaseModel):
 		# 	draw(fig, ax, entropy)
 		# 	print('Iteration '+str(i))
 
-	def calculate_metrics(self, epoch):
+	def calculate_metrics(self, epoch, time_taken):
 		entropy_value = self.session.run(self.cross_entropy, feed_dict=self.train_data)
-		print('The iteration is %d/%d : %f'%(epoch, self.max_iters, entropy_value))
+		print('The iteration is %d/%d : Entropy :%f, Time taken : %d'%(epoch, self.max_iters, entropy_value, time_taken))
 
 	def build_graph(self):
 		filter_size_2 = 2

@@ -97,11 +97,13 @@ def readDataSetInfo(dataset_id='01', shuffle=True, start_index=0):
 	return info_data_dict
 
 
-def readImages(dataset_info, limit=10000, batch_size=40):
+def readImages(dataset_info, limit=2000, batch_size=40):
 	image_data_list = []
 	small_image_data_list = []
 	rotation_data_list = []
 	for index, filename in enumerate(dataset_info['filenames']):
+		if index > limit:
+			break
 		image_path = os.path.join(dataset_info['path'], 'images', filename)
 		image_data = cv2.imread(image_path)
 		small_image_data = cv2.resize(image_data, (0,0), fx=0.4, fy=0.4)

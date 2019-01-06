@@ -10,21 +10,20 @@ import tensorflow as tf
 import os, time, sys, math, random
 
 
-import matplotlib
-from matplotlib import pyplot as plt
+# import matplotlib
+# from matplotlib import pyplot as plt
 # plt.rcParams['figure.figsize'] = (16, 9)
-plt.style.use('ggplot')
+# plt.style.use('ggplot')
 
 
 def weight_variable(shape):
 	initial = tf.truncated_normal(shape, stddev=0.1)
 	return tf.Variable(initial)
 
+
 def bias_variable(length):
 	initial = tf.constant(0.1, shape=[length], dtype=tf.float32)
 	return tf.Variable(initial)
-
-
 
 
 def createConvulationalLayer(input_data, channel_count, filter_size, filter_count, max_pooling=True):
@@ -54,7 +53,6 @@ def createFlattenLayer(layer):
 	# layer_shape[1:4].num_elements()
 	flat_layer = tf.reshape(layer, [-1, feature_count])
 	return flat_layer, feature_count
-
 
 
 def createFullyConnectedLayer(input_data, input_feature_count, output_feature_count, apply_relu=False):
@@ -104,7 +102,7 @@ def readImages(dataset_info, limit=10000, batch_size=40):
 	small_image_data_list = []
 	rotation_data_list = []
 	for index, filename in enumerate(dataset_info['filenames']):
-		image_path = os.path.join(data_info['path'], 'images', filename)
+		image_path = os.path.join(dataset_info['path'], 'images', filename)
 		image_data = cv2.imread(image_path)
 		small_image_data = cv2.resize(image_data, (0,0), fx=0.4, fy=0.4)
 		small_image_data_list.append(small_image_data)
@@ -122,8 +120,6 @@ def readImages(dataset_info, limit=10000, batch_size=40):
 	if image_data_list:
 		yield np.array(image_data_list), np.array(small_image_data_list), np.array(rotation_data_list).reshape(-1, 1)
 
-
-
 def preprocessData(x):
 	mu = np.mean(x, axis=(0, 1, 2), keepdims=1)
 	sigma = np.std(x, axis=(0, 1, 2), keepdims=1)
@@ -131,116 +127,11 @@ def preprocessData(x):
 	x = x / sigma
 	return x
 
-
-
-data_info = readDataSetInfo()
-
-sample_image, sample_small_image, sample_rotation = readImages(data_info, batch_size=1).next()
-
-image_height = sample_small_image.shape[0]
-image_width = sample_small_image.shape[1]
-image_depth = sample_small_image.shape[2]
-
-
-image_height * image_width * image_depth
-
-
-filter_size_2 = 2
-filter_size_3 = 3
-filter_size_5 = 5
-filter_count_24 = 24
-filter_count_32 = 32
-filter_count_36 = 36
-filter_count_48 = 48
-filter_count_64 = 64
-filter_count_128 = 128
-
-fully_conn_layer_1_out_size = 100
-fully_conn_layer_2_out_size = 50
-fully_conn_layer_3_out_size = 10
-fully_conn_layer_4_out_size = 1
-
-
-x = tf.placeholder(tf.float32, shape=[None, image_height, image_width, image_depth])
-y_actual = tf.placeholder(tf.float32, shape=(None, 1))
-
-conv_layer_1, conv_weights_1 = createConvulationalLayer(input_data=x,
-				   channel_count=image_depth,
-				   filter_size=filter_size_5,
-				   filter_count=filter_count_24,
-				   max_pooling=False)
-
-conv_layer_2, conv_weights_2 = createConvulationalLayer(input_data=conv_layer_1,
-				   channel_count=filter_count_24,
-				   filter_size=filter_size_5,
-				   filter_count=filter_count_36,
-				   max_pooling=True)
-
-conv_layer_3, conv_weights_3 = createConvulationalLayer(input_data=conv_layer_2,
-				   channel_count=filter_count_36,
-				   filter_size=filter_size_5,
-				   filter_count=filter_count_48,
-				   max_pooling=False)
-
-conv_layer_4, conv_weights_4 = createConvulationalLayer(input_data=conv_layer_3,
-				   channel_count=filter_count_48,
-				   filter_size=filter_size_3,
-				   filter_count=filter_count_64,
-				   max_pooling=True)
-
-conv_layer_5, conv_weights_5 = createConvulationalLayer(input_data=conv_layer_4,
-				   channel_count=filter_count_64,
-				   filter_size=filter_size_3,
-				   filter_count=filter_count_64,
-				   max_pooling=False)
-
-
-flat_layer, num_features = createFlattenLayer(conv_layer_5)
-
-
-fully_con_layer_1 = createFullyConnectedLayer(input_data=flat_layer,
-						 input_feature_count=num_features,
-						 output_feature_count=fully_conn_layer_1_out_size,
-						 apply_relu=True)
-
-
-fully_con_layer_2 = createFullyConnectedLayer(input_data=fully_con_layer_1,
-						 input_feature_count=fully_conn_layer_1_out_size,
-						 output_feature_count=fully_conn_layer_2_out_size,
-						 apply_relu=True)
-
-
-fully_con_layer_3 = createFullyConnectedLayer(input_data=fully_con_layer_2,
-						 input_feature_count=fully_conn_layer_2_out_size,
-						 output_feature_count=fully_conn_layer_3_out_size,
-						 apply_relu=False)
-
-
-fully_con_layer_4 = createFullyConnectedLayer(input_data=fully_con_layer_3,
-						 input_feature_count=fully_conn_layer_3_out_size,
-						 output_feature_count=fully_conn_layer_4_out_size,
-						 apply_relu=False)
-
-
-y_predicted = fully_con_layer_4 # tf.nn.softmax(fully_con_layer_4)
-cross_entropy = tf.reduce_mean(tf.square(tf.subtract(y_actual, y_predicted)))
-# cross_entropy = tf.reduce_mean(-tf.reduce_sum(y_actual * tf.log(y_predicted), reduction_indices=[1]))
-optimizer = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)
-
-
-is_correct = tf.equal(tf.argmax(y_predicted, 1), tf.argmax(y_actual, 1))
-accuracy = tf.reduce_mean(tf.cast(is_correct, tf.float32))
-
-
-epochs = 20
-session = tf.Session(config=tf.ConfigProto(log_device_placement=True))
-init = tf.global_variables_initializer()
-session.run(init)
-
-
-sess = tf.Session()
-saver = tf.train.Saver()
-saver.restore(sess, os.path.join("model", "model.ckpt"))
+def loadModel():
+	sess = tf.Session()
+	saver = tf.train.Saver()
+	saver.restore(sess, os.path.join("model", "model.ckpt"))
+	return sess
 
 
 def predict(images, actual_value=''):

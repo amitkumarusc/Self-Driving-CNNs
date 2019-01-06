@@ -8,7 +8,7 @@ import tensorflow as tf
 import os, time, sys, math, random
 import threading, Queue
 
-from test import *
+from utils import *
 
 def rotateImage(image, angle):
 	image_center = tuple(np.array(image.shape[1::-1]) / 2)

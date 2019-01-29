@@ -5,6 +5,10 @@ Self Driving Car Convolutional Neural Network implementation using TensorFlow.
 
 ![](assets/car.gif)
 
+<p align="center">
+  <img src="assets/car.gif"/>
+</p>
+
 ## Requirements
 **Library** | **Version**
 --- | ---
